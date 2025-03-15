@@ -65,6 +65,7 @@ const RealTimeChart = () => {
   const clearData = () => {
     setData([]);
     socket.send(JSON.stringify({ command: "clear" }));
+    alert("✅ เคลียร์ข้อมูลเรียบร้อยแล้ว!");
   };
 
   const saveAsAudio = (ecgData) => {
