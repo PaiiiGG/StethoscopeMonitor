@@ -21,7 +21,7 @@ const RealTimeChart = () => {
   }, [data]);
 
   useEffect(() => {
-    const ws = new WebSocket("wss://stethoscopemonitor.onrender.com/");
+    const ws = new WebSocket("ws://localhost:8765/");
     setSocket(ws);
 
     ws.onopen = () => console.log("✅ Connected to WebSocket");
@@ -30,7 +30,11 @@ const RealTimeChart = () => {
       let receivedData = event.data;
       try {
         receivedData = JSON.parse(receivedData);
-        // console.log(receivedData);
+        receivedData.data = receivedData.data - 512;
+        if (receivedData.data < 600 && receivedData.data > 460) {
+          // receivedData.data = 512
+        }
+        // if (receivedData.data > 600 || receivedData.data < 460) console.log(receivedData);
       } catch {}
 
       if (receivedData.data && receivedData.time) {
@@ -43,6 +47,14 @@ const RealTimeChart = () => {
         ]);
         setRealData((prevData) => [
           ...prevData,
+          {
+            time: new Date(receivedData.time).toLocaleTimeString(),
+            value: receivedData.data,
+          },
+          {
+            time: new Date(receivedData.time).toLocaleTimeString(),
+            value: receivedData.data,
+          },
           {
             time: new Date(receivedData.time).toLocaleTimeString(),
             value: receivedData.data,
@@ -65,6 +77,7 @@ const RealTimeChart = () => {
 
   const clearData = () => {
     setData([]);
+    setRealData([]);
     socket.send(JSON.stringify({ command: "clear" }));
     alert("✅ เคลียร์ข้อมูลเรียบร้อยแล้ว!");
   };
@@ -76,13 +89,13 @@ const RealTimeChart = () => {
       return;
     }
 
-    const sampleRate = 1000;
+    const sampleRate = 3000;
     const audioContext = new AudioContext();
     const buffer = audioContext.createBuffer(1, ecgData.length, sampleRate);
     const channelData = buffer.getChannelData(0);
 
     for (let i = 0; i < ecgData.length; i++) {
-      channelData[i] = (ecgData[i].value - 80) / 40; // Normalize อยู่ในช่วง -1 ถึง 1
+      channelData[i] = (ecgData[i].value) / 512; // Normalize อยู่ในช่วง -1 ถึง 1
     }
 
     const offlineCtx = new OfflineAudioContext(1, buffer.length, sampleRate);
@@ -197,7 +210,7 @@ const RealTimeChart = () => {
             data={data}
           >
             <XAxis dataKey="time" stroke="#1976D2" />
-            <YAxis domain={[40, 120]} stroke="#1976D2" />
+            <YAxis  stroke="#1976D2" />
             <CartesianGrid strokeDasharray="3 3" stroke="#B0BEC5" />
             <Tooltip />
             <Legend />
