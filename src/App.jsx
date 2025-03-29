@@ -21,7 +21,7 @@ const RealTimeChart = () => {
   }, [data]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8765/");
+    const ws = new WebSocket("wss://stethoscopemonitor.onrender.com/");
     setSocket(ws);
 
     ws.onopen = () => console.log("✅ Connected to WebSocket");
