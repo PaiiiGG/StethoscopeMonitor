@@ -21,7 +21,7 @@ const RealTimeChart = () => {
   }, [data]);
 
   useEffect(() => {
-    const ws = new WebSocket("wss://stethoscopemonitor.onrender.com/");
+    const ws = new WebSocket("ws://localhost:8765/");
     setSocket(ws);
 
     ws.onopen = () => console.log("✅ Connected to WebSocket");
@@ -30,11 +30,12 @@ const RealTimeChart = () => {
       let receivedData = event.data;
       try {
         receivedData = JSON.parse(receivedData);
+        // console.log(receivedData);
       } catch {}
 
       if (receivedData.data && receivedData.time) {
         setData((prevData) => [
-          ...prevData.slice(-500),
+          ...prevData.slice(-200),
           {
             time: new Date(receivedData.time).toLocaleTimeString(),
             value: receivedData.data,
@@ -75,7 +76,7 @@ const RealTimeChart = () => {
       return;
     }
 
-    const sampleRate = 44100;
+    const sampleRate = 1000;
     const audioContext = new AudioContext();
     const buffer = audioContext.createBuffer(1, ecgData.length, sampleRate);
     const channelData = buffer.getChannelData(0);
@@ -164,7 +165,7 @@ const RealTimeChart = () => {
 
         {/* Buttons */}
         <div className="flex flex-wrap justify-center gap-3 mb-5">
-          <button
+          {/*<button
             onClick={toggleStreaming}
             className={`px-6 py-3 rounded-lg text-white text-lg font-medium shadow-md transition-transform transform active:scale-95 cursor-pointer hover:scale-105 ${
               running
@@ -173,7 +174,7 @@ const RealTimeChart = () => {
             }`}
           >
             {running ? "Stop" : "Start"}
-          </button>
+          </button>*/}
           <button
             onClick={() => saveAsAudio(realData)}
             className="px-5 py-2 bg-blue-500 text-white rounded-lg font-semibold transition duration-300 hover:bg-blue-600 cursor-pointer hover:scale-105"
